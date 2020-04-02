@@ -12,6 +12,55 @@ using namespace std;
 
 #define pi 3.141592653589793
 
+struct node
+{
+	int data;
+	struct node* next;
+};
+
+class linked_list
+{
+	private:
+		node* head, * tail;
+
+	public:
+		linked_list()
+		{
+			head = NULL;
+			tail = NULL;
+		}
+
+		void add_node(int n)
+		{
+			node* tmp = new node;
+			tmp -> data = n;
+			tmp -> next = NULL;
+
+			if (head == NULL)
+			{
+				head = tmp;
+				tail = tmp;
+			}
+			else
+			{
+				tail -> next = tmp;
+				tail = tail -> next;
+			}
+		}
+
+		void print() 
+		{
+			node* ptr;
+			ptr = head;
+			
+			while (ptr != NULL) {
+				cout << ptr -> data << " ";
+				ptr = ptr -> next;
+			}
+		}
+};
+
+
 int distance(int xi, int yi, int x0, int y0, int r)
 {
 	return abs( sqrt( pow((xi - x0),2) + pow((yi - y0), 2) ) - r );
@@ -24,6 +73,17 @@ int fitting_error()
 
 int main(int argc, char** argv)
 {
+	linked_list a;
+	a.add_node(1);
+	a.add_node(2);
+	a.add_node(3);
+	a.add_node(5);
+	a.add_node(7);
+	a.add_node(10);
+	cout << "The linked list is: ";
+	a.print();
+	cout << endl << endl;
+
 	// Read in images
 	const int image_number = 9;
 	string images[image_number];
