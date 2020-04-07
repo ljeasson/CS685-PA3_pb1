@@ -60,15 +60,29 @@ class linked_list
 		}
 };
 
+void hough_circles(Mat img, vector<Vec3f> circles, int Radius)
+{
+	
+}
+
 
 int distance(int xi, int yi, int x0, int y0, int r)
 {
 	return abs( sqrt( pow((xi - x0),2) + pow((yi - y0), 2) ) - r );
 }
 
-int fitting_error()
+int fitting_error(int n)
 {
-	return 0;
+	int sum = 0;
+	int i;
+
+	for (i = 0; i < n; i++) 
+	{
+		sum += 1;
+	}
+
+	sum /= n;
+	return sum;
 }
 
 int main(int argc, char** argv)
@@ -85,17 +99,23 @@ int main(int argc, char** argv)
 	cout << endl << endl;
 
 	// Read in images
-	const int image_number = 9;
+	const int image_number = 14;
 	string images[image_number];
-	images[0] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C1.pgm";
-	images[1] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C2.pgm";
-	images[2] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C3.pgm";
-	images[3] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C4.pgm";
-	images[4] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C5.pgm";
-	images[5] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C6.pgm";
-	images[6] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\overlap1.pgm";
-	images[7] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\overlap2.pgm";
-	images[8] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\overlap3.pgm";
+	images[0] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\test1.pgm";
+	images[1] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\test2.pgm";
+	images[2] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\test3.pgm";
+	images[3] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\test4.pgm";
+	images[4] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\test5.pgm";
+	images[5] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C1.pgm";
+	images[6] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C2.pgm";
+	images[7] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C3.pgm";
+	images[8] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C4.pgm";
+	images[9] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C5.pgm";
+	images[10] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\C6.pgm";
+	images[11] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\overlap1.pgm";
+	images[12] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\overlap2.pgm";
+	images[13] = "C:\\Users\\Lee\\source\\repos\\PA3_pb1\\PA3_pb1\\Circles\\overlap3.pgm";
+	
 
 	int i;
 	for (i = 0; i < image_number; i++)
@@ -118,7 +138,7 @@ int main(int argc, char** argv)
 		// Generate grad_x and grad_y
 		Mat grad_x, grad_y;
 		Mat abs_grad_x, abs_grad_y;
-		Mat grad;
+		Mat img_grad;
 
 		// Gradient X
 		Sobel(img_blur, grad_x, CV_16S, 1, 0, 3, 1, 0, BORDER_DEFAULT);
@@ -129,18 +149,25 @@ int main(int argc, char** argv)
 		convertScaleAbs(grad_y, abs_grad_y);
 
 		// Total Gradient (approximate)
-		addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad);
+		addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, img_grad);
+		imshow("Sobel Edge Detection", img_grad);
 
-		// Create window
-		namedWindow("Sobel Edge Detection");
-		imshow("Sobel Edge Detection", grad);
+
+		// Thresholding
+		Mat img_threshold;
+		double thresh = 50;
+		double maxValue = 255;
+
+		threshold(img_grad, img_threshold, thresh, maxValue, THRESH_BINARY);
+		imshow("Thresholding", img_threshold);
 
 
 		// Apply the Hough Transform to find the circles
 		vector<Vec3f> circles;
-		HoughCircles(grad, circles, HOUGH_GRADIENT, 1,
-			img_blur.rows / 8,
-			220, 55, 0, 0);
+		hough_circles(img_threshold, circles);
+		//HoughCircles(img_threshold, circles, HOUGH_GRADIENT, 1,
+		//	img_blur.rows / 8,
+		//	250, 40, 0, 0);
 
 		// Draw the circles detected
 		for (size_t i = 0; i < circles.size(); i++)
